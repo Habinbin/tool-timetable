@@ -1,0 +1,134 @@
+/**
+ * 이 툴의 시각 토큰.
+ *
+ * 계약 토큰(`--betlab-*`)은 호스트가 정의할 수 있고, 없으면 여기 적힌 기본값을 쓴다.
+ * 그래서 툴은 혼자서도 제대로 보이고, 툴박스에 묶이면 툴박스가 정한 모습으로 바뀐다.
+ * 툴을 고칠 필요가 없다. @theme-contract
+ *
+ * 기본값의 출발점: .agents/design/apple (Apple Style Reference)
+ *
+ * `:root` 가 아니라 `.tool-root` 에 거는 이유: 이 툴은 자기 사이트로도 뜨고 툴박스 안
+ * 한 페이지로도 뜬다. 전역을 오염시키면 호스트의 다른 화면이 물든다.
+ */
+
+.tool-root {
+	/* ── 면 ───────────────────────────────────────── */
+	--surface: var(--betlab-surface, #ffffff);
+	--surface-raised: var(--betlab-surface-raised, #f5f5f7);
+	--surface-sunken: var(--betlab-surface-sunken, #e2e2e5);
+
+	/* ── 선 ───────────────────────────────────────── */
+	--line: var(--betlab-line, #d2d2d7);
+	--line-strong: var(--betlab-line-strong, #b8b8bd);
+
+	/* ── 글자 ─────────────────────────────────────── */
+	--ink: var(--betlab-ink, #1d1d1f);
+	--ink-muted: var(--betlab-ink-muted, #6e6e73);
+	--ink-faint: var(--betlab-ink-faint, #8e8e93);
+
+	/* ── 주 행동 ──────────────────────────────────── */
+	--accent: var(--betlab-accent, #0071e3);
+	--accent-hover: var(--betlab-accent-hover, #0066cc);
+	--on-accent: var(--betlab-on-accent, #ffffff);
+
+	/* ── 의미 ─────────────────────────────────────── */
+	--danger: var(--betlab-danger, #d70015);
+	--success: var(--betlab-success, #248a3d);
+	--warning: var(--betlab-warning, #b25000);
+
+	/* ── 서체 ─────────────────────────────────────────
+	   한글·라틴·숫자를 한 글꼴이 처리한다. 두 글꼴을 짝지으면 한 줄 안에서
+	   x-height 가 달라 미세하게 어긋난다. @typography-and-language */
+	--font: var(
+		--betlab-font,
+		'Noto Sans KR Variable',
+		'Noto Sans KR',
+		ui-sans-serif,
+		system-ui,
+		sans-serif
+	);
+	--font-mono: var(--betlab-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+
+	/* ── 모양 ─────────────────────────────────────── */
+	--radius-control: var(--betlab-radius-control, 8px);
+	--radius-panel: var(--betlab-radius-panel, 12px);
+	--radius-pill: var(--betlab-radius-pill, 980px);
+
+	/* ── 이 툴의 것 (계약 밖) ─────────────────────────
+	   간격은 계약에 넣지 않는다. 목록 사이가 얼마나 떨어져야 읽기 좋은지는
+	   이 화면을 만든 쪽이 안다. @theme-contract */
+	--space-2: 2px;
+	--space-4: 4px;
+	--space-8: 8px;
+	--space-12: 12px;
+	--space-16: 16px;
+	--space-20: 20px;
+	--space-24: 24px;
+	--space-32: 32px;
+
+	--text-caption: 12px;
+	--text-body-sm: 14px;
+	--text-body: 15px;
+	--text-title: 20px;
+
+	/* 30분 한 칸의 높이. 시간축의 모든 좌표가 이 값의 배수다. */
+	--slot-h: 22px;
+	/* 요일 열 사이 틈. `layout.ts` 의 DAY_GAP 과 같은 값 — 바뀌면 같이 바꾼다. */
+	--day-gap: 10px;
+	/* 레인 사이 틈. `layout.ts` 의 LANE_GAP 과 같은 값. */
+	--lane-gap: 2px;
+	/* 시간 눈금 열의 폭. `layout.ts` 의 TIME_GUTTER_WIDTH 와 같은 값. */
+	--gutter-w: 56px;
+
+	/* 30분 보조선은 시각선보다 흐려야 시간축이 한눈에 읽힌다.
+	   계약 토큰에서 파생시켜, 호스트가 선 색을 바꾸면 보조선도 따라간다. */
+	--line-faint: color-mix(in srgb, var(--line) 55%, transparent);
+
+	/* ── 사람 팔레트 ──────────────────────────────────
+	   막대에는 글자가 없다. 사람은 오직 색으로 읽히므로, 인접한 두 칸이 서로
+	   다른 색상환 구역에 오도록 배열한다. 도메인은 몇 번 칸인지만 알고
+	   색값은 여기에만 있다(`schedule.ts` 의 PALETTE_SIZE 와 개수가 같아야 한다). */
+	--person-0: #0071e3;
+	--person-1: #ff9500;
+	--person-2: #34c759;
+	--person-3: #af52de;
+	--person-4: #ff2d55;
+	--person-5: #00c7be;
+	--person-6: #5856d6;
+	--person-7: #ffcc00;
+	--person-8: #ff3b30;
+	--person-9: #5ac8fa;
+	--person-10: #a2845e;
+	--person-11: #8e8e93;
+}
+
+.tool-root {
+	color: var(--ink);
+	font-family: var(--font);
+	font-size: var(--text-body);
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.tool-root *,
+.tool-root *::before,
+.tool-root *::after {
+	box-sizing: border-box;
+}
+
+.tool-root :focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+/*
+ * 호스트 CSS 로부터 폼 컨트롤을 지킨다. 툴박스가 @tailwindcss/forms 를 쓰면
+ * input 포커스 링을 box-shadow 로 그려서 링이 두 겹이 된다.
+ */
+.tool-root input,
+.tool-root button,
+.tool-root textarea,
+.tool-root select {
+	box-shadow: none;
+}
