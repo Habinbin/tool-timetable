@@ -123,6 +123,17 @@
 }
 
 /*
+ * 글자를 고를 때의 강조.
+ *
+ * 브라우저 기본값은 짙은 파란 면인데, 호스트가 무채색 강조를 쓰면 그 파랑만 튄다.
+ * 갓 만든 인원 칩은 임시 이름이 통째로 선택된 채로 뜨므로 이 색이 제일 먼저 보인다.
+ */
+.tool-root ::selection {
+	background-color: color-mix(in srgb, var(--accent) 18%, transparent);
+	color: var(--ink);
+}
+
+/*
  * 호스트 CSS 로부터 폼 컨트롤을 지킨다. 툴박스가 @tailwindcss/forms 를 쓰면
  * input 포커스 링을 box-shadow 로 그려서 링이 두 겹이 된다.
  */
