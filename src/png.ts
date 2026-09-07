@@ -9,7 +9,6 @@
  * 두 그림이 겹쳐 보이는 것은 그 때문이지 우연이 아니다.
  */
 
-import { LOGO_PATHS, LOGO_VIEWBOX } from './logo';
 import { DAY_GAP, LANE_GAP, MIN_DAY_WIDTH, TIME_GUTTER_WIDTH, pngLaneWidth } from './layout';
 import { DAYS, DAY_COUNT, laneBlocks, type Person, type Timetable } from './schedule';
 import { SLOT_COUNT, slotLabel } from './time';
@@ -31,7 +30,6 @@ export interface PngTheme {
 /** 화면 CSS 픽셀 기준 치수. 마지막에 SCALE 배로 확대해 굽는다. */
 const PAD = 28;
 const BANNER_H = 76;
-const LOGO_H = 18;
 const LEGEND_ROW_H = 22;
 const LEGEND_SWATCH = 12;
 const LEGEND_ITEM_GAP = 22;
@@ -81,31 +79,6 @@ function planLegend(
 		x += width + LEGEND_ITEM_GAP;
 	}
 	return { items, rows: people.length === 0 ? 0 : row + 1 };
-}
-
-/**
- * 로고를 원하는 높이로 그린다.
- *
- * @param ctx 컨텍스트.
- * @param x 왼쪽 좌표.
- * @param y 위쪽 좌표.
- * @param height 로고 높이.
- * @param color 채울 색.
- */
-function drawLogo(
-	ctx: CanvasRenderingContext2D,
-	x: number,
-	y: number,
-	height: number,
-	color: string
-): void {
-	const scale = height / LOGO_VIEWBOX.height;
-	ctx.save();
-	ctx.translate(x, y);
-	ctx.scale(scale, scale);
-	ctx.fillStyle = color;
-	for (const path of LOGO_PATHS) ctx.fill(new Path2D(path.d), path.rule ?? 'nonzero');
-	ctx.restore();
 }
 
 /**
@@ -194,13 +167,6 @@ export function drawTimetable(canvas: HTMLCanvasElement, table: Timetable, theme
 	ctx.font = `600 24px ${theme.font}`;
 	ctx.textAlign = 'left';
 	ctx.fillText(table.title, PAD, BANNER_H / 2 + 1);
-	drawLogo(
-		ctx,
-		width - PAD - (LOGO_H * LOGO_VIEWBOX.width) / LOGO_VIEWBOX.height,
-		BANNER_H / 2 - LOGO_H / 2,
-		LOGO_H,
-		theme.onAccent
-	);
 
 	// ── 이름표 ───────────────────────────────────────
 	const legendTop = BANNER_H + PAD;

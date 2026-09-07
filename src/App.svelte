@@ -8,9 +8,7 @@
 
 	import { onMount } from 'svelte';
 
-	import DownloadIcon from '@lucide/svelte/icons/download';
 	import ImageIcon from '@lucide/svelte/icons/image';
-	import UploadIcon from '@lucide/svelte/icons/upload';
 
 	import { renderTimetablePng, type PngTheme } from './png';
 	import {
@@ -18,10 +16,8 @@
 		PALETTE_SIZE,
 		addBlock,
 		addPerson,
-		fromJson,
 		removeBlock,
 		removePerson,
-		serialize,
 		setBlockRange,
 		togglePattern,
 		updatePerson,
@@ -42,7 +38,6 @@
 	/** 저장된 값을 읽기 전에 빈 상태를 덮어쓰지 않기 위한 빗장. */
 	let restored = $state(false);
 	let root: HTMLDivElement | undefined = $state();
-	let picker: HTMLInputElement | undefined = $state();
 
 	onMount(() => {
 		const stored = loadTimetable();
@@ -108,13 +103,6 @@
 		URL.revokeObjectURL(url);
 	}
 
-	function exportJson(): void {
-		download(
-			new Blob([serialize({ title, people, blocks })], { type: 'application/json' }),
-			fileName('json')
-		);
-	}
-
 	async function exportPng(): Promise<void> {
 		if (root === undefined) return;
 		notice = '';
@@ -126,22 +114,6 @@
 		} catch {
 			notice = 'PNG 를 만들지 못했습니다.';
 		}
-	}
-
-	async function importJson(event: Event & { currentTarget: HTMLInputElement }): Promise<void> {
-		const file = event.currentTarget.files?.[0];
-		// 같은 파일을 다시 골라도 change 가 오도록 비운다.
-		event.currentTarget.value = '';
-		if (file === undefined) return;
-		const parsed = fromJson(await file.text());
-		if (parsed === null) {
-			notice = '시간표 JSON 이 아닙니다.';
-			return;
-		}
-		title = parsed.title;
-		people = parsed.people;
-		blocks = parsed.blocks;
-		notice = '';
 	}
 
 	function dropPerson(id: string): void {
@@ -164,30 +136,23 @@
 		<input class="title" bind:value={title} aria-label="시간표 제목" placeholder={DEFAULT_TITLE} />
 
 		<div class="actions">
-			<Button compact onclick={exportJson}>
-				<DownloadIcon size={15} strokeWidth={1.75} />
-				JSON 내보내기
-			</Button>
-			<Button compact onclick={() => picker?.click()}>
-				<UploadIcon size={15} strokeWidth={1.75} />
-				JSON 가져오기
-			</Button>
-			<Button variant="filled" compact onclick={exportPng}>
+			<!--
+				인원이 없으면 내보낼 것이 없다. 숨기지 않고 비활성으로 두어 기능이
+				있다는 것은 남긴다 — 왜 눌리지 않는지는 아래 빈 상태 안내가 말한다.
+				@tool-ux-principles §2
+			-->
+			<Button
+				variant="filled"
+				compact
+				disabled={people.length === 0}
+				title={people.length === 0 ? '인원을 추가하면 내보낼 수 있습니다' : undefined}
+				onclick={exportPng}
+			>
 				<ImageIcon size={15} strokeWidth={1.75} />
 				PNG 내보내기
 			</Button>
 		</div>
 	</div>
-
-	<input
-		bind:this={picker}
-		class="picker"
-		type="file"
-		accept="application/json,.json"
-		aria-hidden="true"
-		tabindex="-1"
-		onchange={importJson}
-	/>
 
 	<PersonRoster
 		{people}
@@ -273,15 +238,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-8);
-	}
-
-	/* 파일 선택은 버튼이 대신 연다. `hidden` 대신 화면 밖으로 두어야 클릭이 먹는다. */
-	.picker {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		opacity: 0;
-		pointer-events: none;
 	}
 
 	.notice {

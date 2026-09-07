@@ -85,21 +85,21 @@
 	--line-faint: color-mix(in srgb, var(--line) 55%, transparent);
 
 	/* ── 사람 팔레트 ──────────────────────────────────
-	   막대에는 글자가 없다. 사람은 오직 색으로 읽히므로, 인접한 두 칸이 서로
-	   다른 색상환 구역에 오도록 배열한다. 도메인은 몇 번 칸인지만 알고
-	   색값은 여기에만 있다(`schedule.ts` 의 PALETTE_SIZE 와 개수가 같아야 한다). */
-	--person-0: #0071e3;
-	--person-1: #ff9500;
-	--person-2: #34c759;
-	--person-3: #af52de;
-	--person-4: #ff2d55;
-	--person-5: #00c7be;
-	--person-6: #5856d6;
-	--person-7: #ffcc00;
-	--person-8: #ff3b30;
-	--person-9: #5ac8fa;
-	--person-10: #a2845e;
-	--person-11: #8e8e93;
+	   dartwork-mpl 의 **인쇄 8색**(`CYCLES['print']`) 을 그대로 쓴다. 연구실 그림이
+	   같은 팔레트를 쓰므로 시간표만 다른 색 체계로 뜨지 않는다.
+
+	   이 묶음은 색상뿐 아니라 **명도까지 벌려** 뽑은 것이다(전 쌍 dL* >= 6.1) — 흑백으로
+	   인쇄해도 사람이 구분된다. 막대에는 글자가 없어 색만으로 읽히므로 그 성질이 그대로
+	   필요하다. 도메인은 몇 번 칸인지만 알고 색값은 여기에만 있다
+	   (`schedule.ts` 의 PALETTE_SIZE 와 개수가 같아야 한다). */
+	--person-0: #1864b0;
+	--person-1: #fdd3a2;
+	--person-2: #338a3f;
+	--person-3: #ef5389;
+	--person-4: #fb9600;
+	--person-5: #d776f0;
+	--person-6: #71d8e5;
+	--person-7: #505458;
 }
 
 .tool-root {

@@ -81,24 +81,32 @@
 		gap: var(--space-8);
 	}
 
+	/*
+		인원을 넣기 전에는 이 화면에서 할 수 있는 일이 이것뿐이다. 그래서 주 행동의
+		처리를 쓴다 — 채운 면에 글자가 음각처럼 뚫린다. 점선 테두리는 "여기에 무언가
+		놓아야 한다"로 읽혀 눌러야 하는 버튼과 어긋났다. @tool-ux-principles §2
+
+		높이 30px 은 인원 칩과 같은 값이다. 한 줄에 나란히 서므로 어긋나면 눈에 띈다.
+	*/
 	.add {
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-4);
 		height: 30px;
 		padding: 0 var(--space-12);
-		border: 1px dashed var(--line-strong);
+		border: 1px solid transparent;
 		border-radius: var(--radius-pill);
-		background-color: transparent;
+		background-color: var(--accent);
 		font-family: var(--font);
 		font-size: var(--text-body-sm);
-		color: var(--ink-muted);
+		font-weight: 500;
+		color: var(--on-accent);
 		cursor: pointer;
+		transition: background-color 0.2s;
 	}
 
 	.add:hover {
-		border-color: var(--accent);
-		color: var(--accent);
+		background-color: var(--accent-hover);
 	}
 
 	.add-field {

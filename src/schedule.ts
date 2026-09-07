@@ -15,10 +15,10 @@ export const DAY_COUNT = DAYS.length;
  * 팔레트 칸 수.
  *
  * 사람은 색 하나를 가지므로, 이 수가 곧 "색만으로 구분되는 인원"의 상한이다.
- * 실제 색값은 `ui/theme.css` 의 `--person-0 … --person-11` 에만 적는다 —
+ * 실제 색값은 `ui/theme.css` 의 `--person-0 … --person-7` 에만 적는다 —
  * 도메인은 몇 번 칸인지만 안다. @theme-contract
  */
-export const PALETTE_SIZE = 12;
+export const PALETTE_SIZE = 8;
 
 /** 실선은 고정 일정, 빗금은 그 밖의 것. 뜻은 쓰는 사람이 정한다. */
 export type Pattern = 'solid' | 'hatch';
