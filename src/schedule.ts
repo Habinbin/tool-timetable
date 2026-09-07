@@ -92,6 +92,27 @@ export function nextColor(people: Person[]): number {
 	return people.length % PALETTE_SIZE;
 }
 
+/** 이름을 아직 받지 못한 사람에게 붙는 이름의 앞머리. */
+const PLACEHOLDER_PREFIX = '인원';
+
+/**
+ * 새 사람에게 임시로 붙일 이름.
+ *
+ * 이름을 나중에 받더라도 사람은 먼저 만들어져야 한다 — 색 칸을 차지하고 레인이
+ * 생겨야 어디에 무엇을 그릴지 정해지기 때문이다. 그동안 비워 두면 이름표와 범례가
+ * 빈칸으로 나가므로, 지금 없는 번호를 찾아 붙인다. 지웠다 다시 넣어도 겹치지 않는다.
+ *
+ * @param people 지금 있는 사람들.
+ * @returns `인원 1` 처럼 아직 쓰이지 않은 이름.
+ */
+export function nextPersonName(people: Person[]): string {
+	const used = new Set(people.map((person) => person.name));
+	for (let index = 1; ; index += 1) {
+		const candidate = `${PLACEHOLDER_PREFIX} ${index}`;
+		if (!used.has(candidate)) return candidate;
+	}
+}
+
 /**
  * 사람을 더한다.
  *

@@ -10,6 +10,7 @@ import {
 	laneBlocks,
 	mergeBlocks,
 	nextColor,
+	nextPersonName,
 	removeBlock,
 	removePerson,
 	serialize,
@@ -41,6 +42,21 @@ function sample(): Timetable {
 	blocks = addBlock(blocks, { personId: second.id, day: 0, range: { start: 2, end: 8 } });
 	return { title: '연구실 시간표', people, blocks };
 }
+
+describe('nextPersonName', () => {
+	it('비어 있으면 1번부터', () => {
+		expect(nextPersonName([])).toBe('인원 1');
+	});
+
+	it('이미 쓰인 번호를 건너뛴다 — 지웠다 다시 넣어도 겹치지 않는다', () => {
+		const people = addPerson(addPerson([], '인원 1'), '인원 3');
+		expect(nextPersonName(people)).toBe('인원 2');
+	});
+
+	it('사람이 직접 준 이름과는 겹치지 않는 한 상관없다', () => {
+		expect(nextPersonName(addPerson([], '조하빈'))).toBe('인원 1');
+	});
+});
 
 describe('인원', () => {
 	it('팔레트를 앞에서부터 순서대로 배정한다', () => {

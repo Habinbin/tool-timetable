@@ -1,4 +1,12 @@
 <script lang="ts">
+	/*
+		인원 줄.
+
+		"인원 추가"를 누르면 **사람이 먼저 생기고** 그 칩 안에서 이름을 받는다. 버튼이
+		입력칸으로 변하지 않는다 — 버튼이 사라지면 방금 무엇을 눌렀는지, 지금 무엇을
+		하는 중인지가 화면에서 없어진다. 색 칸을 차지한 칩이 먼저 보여야 "이 사람"이
+		생겼다는 것이 눈에 남는다.
+	*/
 	import PlusIcon from '@lucide/svelte/icons/plus';
 
 	import type { Person } from '../schedule';
@@ -6,71 +14,36 @@
 
 	interface Props {
 		people: Person[];
-		onadd: (name: string) => void;
+		/** 사람을 하나 만든다. 이름은 그 뒤 칩에서 받는다. */
+		onadd: () => void;
+		/** 방금 만들어져 이름을 기다리는 사람. 그 칩만 입력 상태로 뜬다. */
+		pendingId?: string;
+		/** 이름 입력이 끝났다(확정이든 취소든). */
+		onnamed: () => void;
 		onrename: (id: string, name: string) => void;
 		onrecolor: (id: string, color: number) => void;
 		onremove: (id: string) => void;
 	}
 
-	let { people, onadd, onrename, onrecolor, onremove }: Props = $props();
-
-	let adding = $state(false);
-	let draft = $state('');
-	let field: HTMLInputElement | undefined = $state();
-
-	function open(): void {
-		adding = true;
-		// 입력칸은 아직 DOM 에 없다 — 렌더 다음 틱에 잡는다.
-		queueMicrotask(() => field?.focus());
-	}
-
-	function submit(): void {
-		if (draft.trim() === '') {
-			adding = false;
-			return;
-		}
-		onadd(draft);
-		draft = '';
-		// 한 명만 넣는 경우가 드물다. 입력칸을 열어 둔 채 다음 이름을 받는다.
-		field?.focus();
-	}
-
-	function onKey(event: KeyboardEvent): void {
-		if (event.key === 'Enter') submit();
-		if (event.key === 'Escape') {
-			draft = '';
-			adding = false;
-		}
-	}
+	let { people, onadd, pendingId = '', onnamed, onrename, onrecolor, onremove }: Props = $props();
 </script>
 
 <div class="roster">
 	{#each people as person (person.id)}
 		<PersonChip
 			{person}
+			autoEdit={person.id === pendingId}
+			oneditdone={onnamed}
 			onrename={(name) => onrename(person.id, name)}
 			onrecolor={(color) => onrecolor(person.id, color)}
 			onremove={() => onremove(person.id)}
 		/>
 	{/each}
 
-	{#if adding}
-		<div class="add-field">
-			<input
-				bind:this={field}
-				bind:value={draft}
-				placeholder="이름"
-				aria-label="추가할 인원 이름"
-				onkeydown={onKey}
-				onblur={() => (adding = draft.trim() !== '')}
-			/>
-		</div>
-	{:else}
-		<button class="add" onclick={open}>
-			<PlusIcon size={15} strokeWidth={2} />
-			인원 추가
-		</button>
-	{/if}
+	<button class="add" onclick={onadd}>
+		<PlusIcon size={15} strokeWidth={2} />
+		인원 추가
+	</button>
 </div>
 
 <style>
@@ -107,33 +80,5 @@
 
 	.add:hover {
 		background-color: var(--accent-hover);
-	}
-
-	.add-field {
-		display: flex;
-		align-items: center;
-		height: 30px;
-		padding: 0 var(--space-12);
-		border: 1px solid var(--accent);
-		border-radius: var(--radius-pill);
-	}
-
-	input {
-		width: 8ch;
-		border: 0;
-		background: transparent;
-		padding: 0;
-		font-family: var(--font);
-		font-size: var(--text-body-sm);
-		color: var(--ink);
-	}
-
-	input:focus,
-	input:focus-visible {
-		outline: none;
-	}
-
-	input::placeholder {
-		color: var(--ink-faint);
 	}
 </style>

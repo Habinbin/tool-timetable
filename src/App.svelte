@@ -16,6 +16,7 @@
 		PALETTE_SIZE,
 		addBlock,
 		addPerson,
+		nextPersonName,
 		removeBlock,
 		removePerson,
 		setBlockRange,
@@ -34,6 +35,8 @@
 	let people = $state<Person[]>([]);
 	let blocks = $state<Block[]>([]);
 	let notice = $state('');
+	/** 방금 만들어져 이름을 기다리는 사람. 그 칩만 입력 상태로 뜬다. */
+	let pendingId = $state('');
 
 	/** 저장된 값을 읽기 전에 빈 상태를 덮어쓰지 않기 위한 빗장. */
 	let restored = $state(false);
@@ -116,10 +119,25 @@
 		}
 	}
 
+	/**
+	 * 사람을 만든다. 이름은 그 다음에 칩에서 받는다.
+	 *
+	 * 버튼이 입력칸으로 바뀌는 대신 사람이 먼저 생긴다 — 색 칸을 차지한 칩이 보여야
+	 * "이 사람"이 만들어졌다는 것이 화면에 남는다. 이름은 임시값으로 채워 두고,
+	 * 새 칩이 입력 상태로 떠서 곧바로 덮어쓸 수 있게 한다.
+	 */
+	function addNewPerson(): void {
+		const next = addPerson(people, nextPersonName(people));
+		people = next;
+		pendingId = next.at(-1)?.id ?? '';
+	}
+
 	function dropPerson(id: string): void {
 		const next = removePerson({ title, people, blocks }, id);
 		people = next.people;
 		blocks = next.blocks;
+		// 이름을 기다리던 사람을 지웠다면 그 표시도 같이 없앤다.
+		if (pendingId === id) pendingId = '';
 	}
 
 	function create(seed: { personId: string; day: number; range: TimeRange }): void {
@@ -156,7 +174,9 @@
 
 	<PersonRoster
 		{people}
-		onadd={(name) => (people = addPerson(people, name))}
+		{pendingId}
+		onadd={addNewPerson}
+		onnamed={() => (pendingId = '')}
 		onrename={(id, name) => (people = updatePerson(people, id, { name }))}
 		onrecolor={(id, color) => (people = updatePerson(people, id, { color }))}
 		onremove={dropPerson}

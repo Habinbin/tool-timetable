@@ -1,21 +1,33 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
+
 	import XIcon from '@lucide/svelte/icons/x';
 
 	import { PALETTE_SIZE, type Person } from '../schedule';
 
 	interface Props {
 		person: Person;
+		/** 방금 만들어진 칩이면 이름 입력 상태로 뜬다. */
+		autoEdit?: boolean;
+		/** 이름 입력이 끝났다 — 확정이든 취소든 한 번만 부른다. */
+		oneditdone?: () => void;
 		onrename: (name: string) => void;
 		onrecolor: (color: number) => void;
 		onremove: () => void;
 	}
 
-	let { person, onrename, onrecolor, onremove }: Props = $props();
+	let { person, autoEdit = false, oneditdone, onrename, onrecolor, onremove }: Props = $props();
 
-	/** 이름은 평소 글자로 있다가 눌렀을 때만 입력칸이 된다 — 칩이 폼처럼 보이지 않게. */
-	let editing = $state(false);
+	/*
+		이름은 평소 글자로 있다가 눌렀을 때만 입력칸이 된다 — 칩이 폼처럼 보이지 않게.
+
+		막 만들어진 칩은 입력 상태로 시작한다. 칩은 `person.id` 로 키가 걸려 있어
+		사람이 생길 때 새로 마운트되므로, 초기값으로 잡으면 충분하다 — 나중에 켜고
+		끄는 효과를 걸면 이름을 고치는 중에 다시 열리는 일이 생긴다.
+	*/
+	let editing = $state(untrack(() => autoEdit));
 	let picking = $state(false);
-	let draft = $state('');
+	let draft = $state(untrack(() => (autoEdit ? person.name : '')));
 
 	const slots = Array.from({ length: PALETTE_SIZE }, (_, index) => index);
 
@@ -25,13 +37,33 @@
 	}
 
 	function commit(): void {
+		if (!editing) return;
 		editing = false;
 		if (draft.trim() !== '' && draft.trim() !== person.name) onrename(draft);
+		oneditdone?.();
+	}
+
+	function cancel(): void {
+		editing = false;
+		oneditdone?.();
 	}
 
 	function onKey(event: KeyboardEvent): void {
 		if (event.key === 'Enter') commit();
-		if (event.key === 'Escape') editing = false;
+		if (event.key === 'Escape') cancel();
+	}
+
+	/**
+	 * 입력칸을 잡고 글자를 전부 고른다.
+	 *
+	 * 갓 만든 사람의 이름은 `인원 1` 같은 임시값이라, 지우고 쓰게 하지 않고 바로
+	 * 덮어쓸 수 있어야 한다.
+	 *
+	 * @param node 이름 입력칸.
+	 */
+	function takeFocus(node: HTMLInputElement): void {
+		node.focus();
+		node.select();
 	}
 </script>
 
@@ -45,7 +77,7 @@
 		></button>
 
 		{#if picking}
-			<!-- 팔레트 밖의 색은 고르게 하지 않는다. 열두 칸이면 충분하고,
+			<!-- 팔레트 밖의 색은 고르게 하지 않는다. 여덟 칸이면 충분하고,
 			     색값을 theme.css 한 곳에만 두는 계약도 지켜진다. @theme-contract -->
 			<div class="palette">
 				{#each slots as slot (slot)}
@@ -65,14 +97,14 @@
 	</div>
 
 	{#if editing}
-		<!-- svelte-ignore a11y_autofocus -->
 		<input
 			class="name-input"
 			bind:value={draft}
-			autofocus
 			size={Math.max(3, draft.length)}
+			aria-label="이름"
 			onkeydown={onKey}
 			onblur={commit}
+			use:takeFocus
 		/>
 	{:else}
 		<button class="name" onclick={beginEdit}>{person.name}</button>
@@ -116,7 +148,7 @@
 		top: calc(100% + var(--space-8));
 		left: 0;
 		display: grid;
-		grid-template-columns: repeat(6, 20px);
+		grid-template-columns: repeat(4, 20px);
 		gap: var(--space-4);
 		padding: var(--space-8);
 		border: 1px solid var(--line);
